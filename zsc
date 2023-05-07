@@ -1,0 +1,174 @@
+#include<stdlib.h>
+#include<stdio.h>
+#include<string.h>
+#include<iostream>
+using namespace std;
+typedef struct Word
+{
+	char b[16];
+	int g;
+	struct Word *next;
+}word;
+word *creat(char c[])//将文件中单词放入链表
+{
+	word *l,*m,*n;
+	char a[16][16];
+	char cc[20];
+	FILE *fp;
+	char wen1[10]="1.txt",wen2[10]="2.txt",wen3[10]="3.txt",wen4[10]="4.txt",wen5[10]="5.txt";
+	strcpy(cc,c);
+	if (strcmp(cc,wen1)==0)
+	fp=fopen("1.txt","r");
+	if (strcmp(cc,wen2)==0)
+	fp=fopen("2.txt","r");
+	if (strcmp(cc,wen3)==0)
+	fp=fopen("3.txt","r");
+	if (strcmp(cc,wen4)==0)
+	fp=fopen("4.txt","r");
+	if (strcmp(cc,wen5)==0)
+	fp=fopen("5.txt","r");
+	int i=0,j=0;
+	l=new word;
+	l->next=NULL;
+	m=l;
+	while (!feof(fp))
+	{
+		fscanf(fp,"%s",a[i++]);
+	}
+	for (int j=0;j<i;j++)
+	{
+		n=new word;
+		strcpy(n->b,a[j]);
+		n->g=1;//单词的个数
+		n->next=m->next;
+		m->next=n;
+		m=n;
+	}
+	m->next=NULL;
+	l->g=i;//每篇作文的单词数
+	fclose(fp);
+	return l;
+}
+void fun1(word *l)//删除链表中重复单词
+{
+	word *t,*p,*q1,*q2;
+	p=l->next;
+	while (p->next!=NULL)
+	{
+		q1=p;
+		q2=p->next;
+		while (q2!=NULL)
+		{
+			if (strcmp(p->b,q2->b)==0)
+			{
+				p->g=p->g+1;//单词个数加一
+				t=q2;
+				q2=q2->next;
+				q1->next=q2;
+				free(t);
+			}
+			else 
+			{
+				q2=q2->next;
+				q1=q1->next;
+			}
+		}
+		p=p->next;
+	}
+}
+double fun2 (word *L1,word*L2)
+{
+	double aa,bb=0;
+	aa=L1->g;//第一篇作文单词总数
+	word *p1,*p2,*q1,*q2;
+	p1=L1;
+	p2=L2;
+	q1=p1->next;
+	q2=p2->next;
+	while (q1!=NULL)
+	{
+		while (q2!=NULL)
+		{
+			if (strcmp(q1->b,q2->b)==0)
+				bb++;//重复单词数加一
+			q2=q2->next;
+		}
+		q1=q1->next;
+	}
+	return (bb/aa);//重复率(相对于第一篇作文)
+}
+void print(word *l)//暂时输出链表中的数据
+{
+	word *h;
+	h=l;
+	while (h->next!=NULL)
+	{
+		h=h->next;
+		printf("%s\n",h->b);
+	}
+}
+int main ()
+{
+	double  h[5][5];
+	h[0][0]=h[1][1]=h[2][2]=h[3][3]=h[4][4]=1;
+	int to;
+	char c1[10],c2[10],c3[10],c4[10],c5[10];
+	printf("请输入学生的人数\n");
+	scanf("%d",&to);
+	printf("请输入%d篇英语作文的文件名(中间以空格隔开)\n",to);
+	switch (to)
+	{
+	case 2:scanf("%s%s",&c1,&c2);break;
+	case 3:scanf("%s%s%s",&c1,&c2,&c3);break;
+	case 4:scanf("%s%s%s%s",&c1,&c2,&c3,&c4);break;
+	case 5:scanf("%s%s%s%s%s",&c1,&c2,&c3,&c4,&c5);break;
+	}
+	int num1=0,num2=0,num3=0,num4=0,num5=0;
+	word *essay1,*essay2,*essay3,*essay4,*essay5;
+	if (to==2)//两个学生
+	{
+		essay1=creat(c1);essay2=creat(c2);
+		fun1(essay1);fun1(essay2);
+		h[0][1]=fun2(essay1,essay2);
+		h[1][0]=fun2(essay2,essay1);
+	}
+	if (to==3)//三个学生
+	{
+		essay1=creat(c1);essay2=creat(c2);	essay3=creat(c3);
+		fun1(essay1);fun1(essay2);fun1(essay3);
+		h[0][1]=fun2(essay1,essay2);h[0][2]=fun2(essay1,essay3);
+		h[1][0]=fun2(essay2,essay1);h[1][2]=fun2(essay2,essay3);
+		h[2][0]=fun2(essay3,essay1);h[2][1]=fun2(essay3,essay2);
+	}
+	if (to==4)//四个学生
+	{
+		essay1=creat(c1);essay2=creat(c2);	essay3=creat(c3);essay4=creat(c4);
+		fun1(essay1);fun1(essay2);fun1(essay3);fun1(essay4);
+		h[0][1]=fun2(essay1,essay2);h[0][2]=fun2(essay1,essay3);h[0][3]=fun2(essay1,essay4);
+		h[1][0]=fun2(essay2,essay1);h[1][2]=fun2(essay2,essay3);h[1][3]=fun2(essay2,essay4);
+		h[2][0]=fun2(essay3,essay1);h[2][1]=fun2(essay3,essay2);h[2][3]=fun2(essay3,essay4);
+		h[3][0]=fun2(essay4,essay1);h[3][1]=fun2(essay4,essay2);h[3][2]=fun2(essay4,essay3);
+	}
+	if (to==5)//五个学生
+	{
+		essay1=creat(c1);essay2=creat(c2);	essay3=creat(c3);essay4=creat(c4);essay5=creat(c5);
+		fun1(essay1);fun1(essay2);fun1(essay3);fun1(essay4);fun1(essay5);
+		h[0][1]=fun2(essay1,essay3);h[0][2]=fun2(essay1,essay3);h[0][3]=fun2(essay1,essay4);h[0][4]=fun2(essay1,essay5);
+		h[1][0]=fun2(essay2,essay3);h[1][2]=fun2(essay2,essay3);h[1][3]=fun2(essay2,essay4);h[1][4]=fun2(essay2,essay5);
+		h[2][0]=fun2(essay3,essay1);h[2][1]=fun2(essay3,essay2);h[2][3]=fun2(essay3,essay4);h[2][4]=fun2(essay3,essay5);
+		h[3][0]=fun2(essay4,essay1);h[3][1]=fun2(essay4,essay2);h[3][2]=fun2(essay4,essay3);h[3][4]=fun2(essay4,essay5);
+		h[4][0]=fun2(essay5,essay1);h[4][1]=fun2(essay5,essay2);h[4][2]=fun2(essay5,essay3);h[4][3]=fun2(essay5,essay4);
+	}
+	for (int i=0;i<to;i++)//输出重复率九宫格
+		{
+			for (int j=0;j<to;j++)
+			{
+				if (j==to-1)
+					printf("%.2lf\n",h[i][j]*100);
+				else
+					printf("%.2lf ",h[i][j]*100);
+			}
+		}
+	//print(essay1);//暂时输出文章
+ 	return 0;
+}
